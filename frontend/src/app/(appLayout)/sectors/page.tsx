@@ -20,32 +20,32 @@ export default function GroupList() {
     )
 
     return (
-        <div>
-            <h2 className="text-3xl font-bold mb-6">Group List</h2>
+        <div className="p-6 rounded-lg shadow-md text-white">
+            <h2 className="text-3xl font-bold text-gray-300 mb-6">List of Sectors</h2>
             <Input
                 type="text"
                 placeholder="Search groups..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="mb-4"
+                className="mb-4 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Total Valves</TableHead>
-                        <TableHead>Active Valves</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="text-left text-gray-600">ID</TableHead>
+                        <TableHead className="text-left text-gray-600">Name</TableHead>
+                        <TableHead className="text-left text-gray-600">Total Valves</TableHead>
+                        <TableHead className="text-left text-gray-600">Active Valves</TableHead>
+                        <TableHead className="text-left text-gray-600">Status</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {filteredGroups.map((group) => (
                         <TableRow key={group.id}>
-                            <TableCell>{group.id}</TableCell>
-                            <TableCell>{group.name}</TableCell>
-                            <TableCell>{group.valveCount}</TableCell>
-                            <TableCell>{group.activeValves}</TableCell>
+                            <TableCell className="text-gray-700">{group.id}</TableCell>
+                            <TableCell className="text-gray-700">{group.name}</TableCell>
+                            <TableCell className="text-gray-700">{group.valveCount}</TableCell>
+                            <TableCell className="text-gray-700">{group.activeValves}</TableCell>
                             <TableCell>
                                 <Badge variant={group.activeValves > 0 ? "success" : "secondary"}>
                                     {group.activeValves > 0 ? "Active" : "Inactive"}

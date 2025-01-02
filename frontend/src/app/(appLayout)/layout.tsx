@@ -1,10 +1,24 @@
-import {Sidebar} from "@/app/(appLayout)/sidebar";
+"use client"
+import useAuth from "@/hooks/use-auth";
+import {useEffect} from "react";
+import {useRouter} from "next/navigation";
+import Topbar from "@/app/(appLayout)/_components/topbar";
 
 const AppLayout = ({ children }) => {
+
+    const { isLoggedOut, loading } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!loading && isLoggedOut) router.push('/login')
+    }, [loading]);
+
     return (
-        <div className="flex h-screen bg-gray-100">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto p-8">{children}</main>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100">
+            <Topbar />
+            <main className="flex-1 overflow-y-auto max-w-[1600px] p-6 mx-auto">
+              {children}
+          </main>
         </div>
     )
 }
