@@ -11,15 +11,17 @@ def set_token_cookies(response, access_token, refresh_token):
         key='ACCESS_TOKEN',
         value=access_token,
         expires=datetime.now() + timedelta(hours=1),
-        samesite=False,
-        httponly=True,
+        samesite="Lax",
+        httponly=False,
+        secure=False,
     )
     response.set_cookie(
         key='REFRESH_TOKEN',
         value=refresh_token,
         expires=datetime.now() + timedelta(days=30),
-        samesite=False,
-        httponly=True,
+        samesite='Lax',
+        httponly=False,
+        secure=False,
     )
     return response
 

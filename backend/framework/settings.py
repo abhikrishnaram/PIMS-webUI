@@ -54,7 +54,12 @@ MIDDLEWARE = [
     'framework.middleware.RefreshTokenMiddleware',
 ]
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = env.str("CORS_ALLOWED_ORIGINS", default='http://localhost:3000').split(',')
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_SECURE = False     # Set to True in production with HTTPS
+SESSION_COOKIE_SAMESITE = 'Lax'  # Adjust based on your requirements ('Strict' or 'None')
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 ROOT_URLCONF = 'framework.urls'
 
