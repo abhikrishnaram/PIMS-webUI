@@ -9,7 +9,7 @@ const Fetcher = (fetchURL: string, isPost: boolean = false, data: object = {}) =
             body: JSON.stringify(data)
         })
 
-    return fetch(`${process.env.BACKEND_URL}${fetchURL}`)
+    return fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${fetchURL}`)
 }
 
 export default Fetcher;

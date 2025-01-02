@@ -3,6 +3,7 @@ import useAuth from "@/hooks/use-auth";
 import {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import Topbar from "@/app/(appLayout)/_components/topbar";
+import Fetcher from "@/lib/fetcher";
 
 const AppLayout = ({ children }) => {
 

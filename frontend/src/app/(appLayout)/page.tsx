@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,24 +11,39 @@ import {
 import {Input} from "@/components/ui/input";
 import ValveControlSection from "@/app/(appLayout)/_components/valve-control";
 import Topbar from "@/app/(appLayout)/_components/topbar";
+import Fetcher from '@/lib/fetcher';
 
 const Dashboard = () => {
-  const [activeZone, setActiveZone] = useState('Zone 1');
 
-  const zones = {
-    'Zone 1': {
-      valves: [
-        { id: 1, name: 'Valve 1', status: 'active', flow: '2.3 L/min', pressure: '2.4 bar', battery: 85, signal: 90 },
-        { id: 2, name: 'Valve 2', status: 'inactive', flow: '0 L/min', pressure: '2.1 bar', battery: 90, signal: 85 },
-      ],
-      metrics: {
-        totalFlow: '45.2 L/min',
-        avgPressure: '2.3 bar',
-        activeValves: 3,
-        alerts: 0
-      }
+  const [valves, setValves] = useState([]);
+  const [groups, setGroups] = useState([]);
+
+  const metrics = {
+    totalFlow: '45.2 L/min',
+    avgPressure: '2.3 bar',
+    activeValves: 3,
+    alerts: 0
+  }
+
+  useEffect(() => {
+    const getData = async () => {
+      const dgroups = await Fetcher('/api/groups/?format=json')
+      const groupResponse = await dgroups.json()
+      setGroups(groupResponse);
+
+      const data = await Fetcher('/api/valves/?format=json')
+      const response = await data.json()
+      
+      console.log(response)
+      console.log(groupResponse)
+
+      setValves(response.map(valve => {
+        valve.group = groupResponse.find(group => group.id === valve.group)
+        return valve
+      }))
     }
-  };
+    getData()
+  }, [])
 
   return (
         <>
@@ -36,7 +51,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {[
               {icon: Droplet, label: 'Total Flow', value: '156.7 L/min', trend: '+2.3%'},
-              {icon: Signal, label: 'Network Status', value: '98% Online', trend: '23 Nodes'},
+              {icon: Signal, label: 'Network Status', value: '8% Online', trend: '2 Nodes'},
               {icon: Activity, label: 'System Load', value: '76%', trend: 'Normal'},
               {icon: AlertTriangle, label: 'Active Alerts', value: '0', trend: 'All Clear'}
             ].map((stat, index) => (
@@ -134,7 +149,7 @@ const Dashboard = () => {
 
             {/* System Status */}
             <div>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-slate-800/50 text-white border-slate-700">
                 <CardHeader>
                   <CardTitle>System Status</CardTitle>
                 </CardHeader>
@@ -144,11 +159,11 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Mesh Network</span>
                       <Badge className="bg-emerald-500/20 text-emerald-400">
-                        23/23 Online
+                        2/23 Online
                       </Badge>
                     </div>
                     <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 w-[98%]"/>
+                      <div className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 w-[8%]"/>
                     </div>
                   </div>
 
@@ -187,7 +202,7 @@ const Dashboard = () => {
           </div>
 
           <div className="lg:col-span-2 mt-6">
-            <ValveControlSection zones={zones} activeZone={activeZone} />
+            <ValveControlSection valves={valves} groups={groups} setValves={setValves} />
           </div>
         </>
   );

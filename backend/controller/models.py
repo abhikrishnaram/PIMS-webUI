@@ -22,9 +22,25 @@ class Valve(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='valves')
     status = models.CharField(max_length=20, choices=[('on', 'On'), ('off', 'Off'), ('fault', 'Fault')])
     last_updated = models.DateTimeField(auto_now=True)
+    controller = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} ({self.group.name})"
+    
+    def is_open(self):
+        return self.status == 'on'
+    
+    def set_open(self):
+        self.status = 'on'
+        self.save()
+
+    def set_close(self):
+        self.status = 'off'
+        self.save()
+
+    def set_fault(self):
+        self.status = 'fault'
+        self.save()
 
 
 class Task(models.Model):

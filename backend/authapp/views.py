@@ -24,7 +24,7 @@ class UserLoginView(TokenObtainPairView):
 
 
 class GroupAPIKeyView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         group_id = kwargs.get('group_id')

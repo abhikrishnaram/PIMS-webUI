@@ -5,13 +5,16 @@ import {Activity, Battery, Droplet, Settings, Signal} from "lucide-react";
 import React, {useState} from "react";
 import {Input} from "@/components/ui/input";
 import ValveCard from "@/app/(appLayout)/_components/valve-card";
+import Fetcher from "@/lib/fetcher";
+import { toast } from "@/hooks/use-toast";
 
 const getStatusColor = (status) => status === 'active' ? 'bg-emerald-500' : 'bg-slate-500';
 const getSignalColor = (strength) => strength > 80 ? 'text-emerald-500' : strength > 60 ? 'text-amber-500' : 'text-red-500';
 
-const ValveControlSection = ({zones, activeZone}) => {
+const ValveControlSection = ({ valves, groups, setValves }) => {
 
     const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState([]);
 
     const stats = {
         totalValves: 24,
@@ -20,16 +23,36 @@ const ValveControlSection = ({zones, activeZone}) => {
         pressure: '2.4 bar'
     };
 
-    const valves = [
-        { id: 1, name: 'Valve N1', sector: 'North Field', status: 'active', flow: '2.3 L/min' },
-        { id: 2, name: 'Valve S1', sector: 'South Field', status: 'active', flow: '2.1 L/min' }
-    ];
+    const filteredValves = valves.filter(valve => {
+        return valve.name.toLowerCase().includes(searchQuery.toLowerCase()) || valve.group.name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
 
+    const handleUpdate = async (valve) => {
+        setLoading([...loading, valve.id]);
 
-    const filteredValves = valves.filter(valve =>
-        valve.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        valve.sector.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+        const res = await Fetcher(`/api/valves/${valve.id}/toggle`)
+        const data = await res.json()
+
+        if (data.valve_status !== null) {
+            const updatedValves = valves.map(v => {
+                if (v.id === valve.id) {
+                    return {
+                        ...v,
+                        status: data.valve_status
+                    }
+                }
+                return v
+            })
+
+            setValves(updatedValves)
+        } else {
+            toast({
+                title: 'Error',
+                description: 'Failed to update valve status',
+            })
+        }
+        setLoading(loading.filter(id => id !== valve.id))
+    }
 
     return (
         <Card className="bg-slate-800/50 border-slate-700">
@@ -46,8 +69,18 @@ const ValveControlSection = ({zones, activeZone}) => {
     </CardHeader>
     <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {zones[activeZone].valves.map((valve) => (
-                <ValveCard valve={valve} key={valve.id} />
+            {filteredValves.map((valve) => (
+                <ValveCard
+                    isActive={valve.status === 'on'}
+                    toggleActive={() => handleUpdate(valve)}
+                    valve={{
+                        ...valve,
+                        memory: '40%',
+                        signal: 90,
+                    }} 
+                    key={valve.id} 
+                    loading={loading.includes(valve.id)}
+                />
             ))}
         </div>
     </CardContent>
